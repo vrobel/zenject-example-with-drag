@@ -9,17 +9,18 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private bool IsDragging => _draggedObject != null;
     private SceneItem _draggedObject;
     private LibraryAsset _objectAsset;
-    private SceneItem.Factory _sceneItemFactory;
+    private SceneModel _sceneModel;
     private Camera _mainCamera;
 
     [Inject]
-    private void Inject(SceneItem.Factory sceneItemFactory, Camera mainCamera)
+    private void Inject(SceneModel sceneModel, Camera mainCamera)
     {
-        _sceneItemFactory = sceneItemFactory;
+        _sceneModel = sceneModel;
         _mainCamera = mainCamera;
     }
 
-    public void InitializeDrag(SceneItem draggedObject, LibraryAsset objectAsset, PointerEventData eventData)
+    public void InitializeDrag(SceneItem draggedObject, LibraryAsset objectAsset,
+        PointerEventData eventData)
     {
         _draggedObject = draggedObject;
         _objectAsset = objectAsset;
@@ -37,21 +38,17 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         //if dragged object is missing, needs to be spawned.
         if (_draggedObject == null)
         {
-            _draggedObject = _sceneItemFactory.Create(_objectAsset.SceneItemPrefab);
+            _draggedObject = _sceneModel.CreateSceneItem(_objectAsset);
         }
 
-        var eventDataSelectedObject = _draggedObject.gameObject;
-        eventData.selectedObject = eventDataSelectedObject;
+        eventData.selectedObject = _draggedObject.gameObject;
+        MoveToPosition(eventData.position, true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        var ray = _mainCamera.ScreenPointToRay(eventData.position);
-        var groundLayerMask = LayerMask.GetMask("Ground");
-        if (Physics.Raycast(ray, out var hitInfo, float.MaxValue, groundLayerMask))
-        {
-            _draggedObject.MoveTo(hitInfo.point);
-        }
+        var eventDataPosition = eventData.position;
+        MoveToPosition(eventDataPosition);
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -62,7 +59,23 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnCancel(BaseEventData eventData)
     {
         eventData.selectedObject = null;
-        Destroy(_draggedObject.gameObject);
+        if (_draggedObject != null) _sceneModel.DestroySceneItem(_draggedObject);
         _draggedObject = null;
+    }
+
+    private void MoveToPosition(Vector2 eventDataPosition,
+        bool includeTransformMovement = false)
+    {
+        var ray = _mainCamera.ScreenPointToRay(eventDataPosition);
+        var groundLayerMask = LayerMask.GetMask("Ground");
+        if (Physics.Raycast(ray, out var hitInfo, float.MaxValue, groundLayerMask))
+        {
+            if (includeTransformMovement)
+            {
+                _draggedObject.transform.position = hitInfo.point;
+            }
+
+            _draggedObject.MoveTo(hitInfo.point);
+        }
     }
 }
