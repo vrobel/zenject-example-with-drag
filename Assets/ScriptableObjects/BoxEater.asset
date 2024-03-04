@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: BoxEater
   m_EditorClassIdentifier: 
   label: Box Eater
-  thumbnail: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  thumbnail: {fileID: 21300000, guid: deeea67a6e04c6f4bb4abf7f97ac6e91, type: 3}
   listItemPrefab: {fileID: 821506847332662781, guid: a19a16e6f1a193549b57697595614650,
     type: 3}
-  sceneItemPrefab: {fileID: 7349231555025923925, guid: c53248698765c5f4794b66299745c0ea,
+  sceneItemPrefab: {fileID: 3408839534959272086, guid: 6bfb8e1d25f557a4584f99141afd8791,
     type: 3}

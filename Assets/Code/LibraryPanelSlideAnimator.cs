@@ -51,7 +51,7 @@ namespace Code
         public void Initialize()
         {
             _panelAnchoredPosition = panel.anchoredPosition;
-            _observablePlacementSystem.DraggedObject.Subscribe(OnDragging)
+            _observablePlacementSystem.DraggedObjectObservable.Subscribe(OnDragging)
                 .AddTo(ref _disposable);
         }
 

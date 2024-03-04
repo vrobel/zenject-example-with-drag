@@ -1,6 +1,7 @@
 ﻿using System;
 using Code.Assets;
 using Code.Signals;
+using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
@@ -9,8 +10,13 @@ namespace Code
 {
     public class SceneItem : MonoBehaviour, IInitializePotentialDragHandler, IDragHandler
     {
+        public readonly ReactiveProperty<bool> IsActiveProperty =
+            new ReactiveProperty<bool>(true);
+        
         [SerializeField] private Rigidbody rb;
         private SignalBus _signalBus;
+
+        public bool isActive => IsActiveProperty.Value;
 
         [Inject]
         private void Construct(SignalBus signalBus)

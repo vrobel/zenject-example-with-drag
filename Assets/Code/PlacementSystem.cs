@@ -6,15 +6,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
 
-public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBeginDragHandler,
+    IDragHandler, IEndDragHandler
 {
-    private readonly ReactiveProperty<SceneItem> _draggedObject =
+    private readonly ReactiveProperty<SceneItem> _draggedObjectProperty =
         new ReactiveProperty<SceneItem>();
+
     private LibraryAsset _objectAsset;
     private SceneModel _sceneModel;
     private Camera _mainCamera;
 
-    public Observable<SceneItem> DraggedObject => _draggedObject;
+    public Observable<SceneItem> DraggedObjectObservable => _draggedObjectProperty;
 
     [Inject]
     private void Inject(SceneModel sceneModel, Camera mainCamera)
@@ -26,11 +28,12 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBegin
     public void InitializeDrag(SceneItem draggedObject, LibraryAsset objectAsset,
         PointerEventData eventData)
     {
-        _draggedObject.Value = draggedObject;
+        _draggedObjectProperty.Value = draggedObject;
         _objectAsset = objectAsset;
 
         if (draggedObject != null)
         {
+            draggedObject.IsActiveProperty.Value = false;
             eventData.selectedObject = draggedObject.gameObject;
         }
 
@@ -42,12 +45,12 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBegin
     public void OnBeginDrag(PointerEventData eventData)
     {
         //if dragged object is missing, needs to be spawned.
-        if (_draggedObject.Value == null)
+        if (_draggedObjectProperty.Value == null)
         {
-            _draggedObject.Value = _sceneModel.CreateSceneItem(_objectAsset);
+            _draggedObjectProperty.Value = _sceneModel.CreateSceneItem(_objectAsset);
         }
 
-        eventData.selectedObject = _draggedObject.Value.gameObject;
+        eventData.selectedObject = _draggedObjectProperty.Value.gameObject;
         MoveToPosition(eventData.position, true);
     }
 
@@ -59,15 +62,17 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBegin
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        _draggedObject.Value.MoveBy(Vector3.up * .2f);
-        _draggedObject.Value = null;
+        _draggedObjectProperty.Value.IsActiveProperty.Value = true;
+        _draggedObjectProperty.Value.MoveBy(Vector3.up * .2f);
+        _draggedObjectProperty.Value = null;
     }
 
     public void OnCancel(BaseEventData eventData)
     {
         eventData.selectedObject = null;
-        if (_draggedObject.Value != null) _sceneModel.DestroySceneItem(_draggedObject.Value);
-        _draggedObject.Value = null;
+        if (_draggedObjectProperty.Value != null)
+            _sceneModel.DestroySceneItem(_draggedObjectProperty.Value);
+        _draggedObjectProperty.Value = null;
     }
 
     #endregion
@@ -81,10 +86,10 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBegin
         {
             if (includeTransformMovement)
             {
-                _draggedObject.Value.transform.position = hitInfo.point;
+                _draggedObjectProperty.Value.transform.position = hitInfo.point;
             }
 
-            _draggedObject.Value.MoveTo(hitInfo.point);
+            _draggedObjectProperty.Value.MoveTo(hitInfo.point);
         }
     }
 }

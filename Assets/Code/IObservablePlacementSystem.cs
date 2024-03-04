@@ -3,5 +3,5 @@ using R3;
 
 public interface IObservablePlacementSystem
 {
-    Observable<SceneItem> DraggedObject { get; }
+    Observable<SceneItem> DraggedObjectObservable { get; }
 }

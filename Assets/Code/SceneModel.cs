@@ -11,6 +11,8 @@ namespace Code
         private Transform _root;
         private SceneItem.Factory _factory;
 
+        public IReadOnlyList<SceneItem> SceneItemsReadonly => _sceneItems.AsReadOnly();
+
         [Inject]
         private void Construct(Transform root, SceneItem.Factory factory)
         {
@@ -25,6 +27,7 @@ namespace Code
             Debug.Assert(libraryAsset.SceneItemPrefab, libraryAsset);
             
             var sceneItem = _factory.Create(libraryAsset.SceneItemPrefab);
+            sceneItem.IsActiveProperty.Value = false;
             sceneItem.transform.SetParent(_root);
             _sceneItems.Add(sceneItem);
             return sceneItem;
