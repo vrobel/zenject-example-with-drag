@@ -3,6 +3,7 @@ using Code.Signals;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using Zenject;
 
 namespace Code
@@ -10,6 +11,7 @@ namespace Code
     public class LibraryAssetItem : MonoBehaviour, IInitializePotentialDragHandler, IDragHandler
     {
         [SerializeField] private LibraryAsset libraryAssetReference;
+        [SerializeField] private Image image;
         [SerializeField] private TextMeshProUGUI label;
         private SignalBus _signalBus;
 
@@ -33,6 +35,7 @@ namespace Code
             if (libraryAssetReference != null)
             {
                 label.text = libraryAssetReference.Label;
+                image.sprite = libraryAssetReference.Thumbnail;
             }
         }
 
