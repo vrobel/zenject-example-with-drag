@@ -17,6 +17,11 @@ namespace Code
         {
             _signalBus = signalBus;
         }
+
+        public void MoveBy(Vector3 vector3)
+        {
+            rb.MovePosition(rb.position + vector3);
+        }
         
         public void MoveTo(Vector3 position)
         {

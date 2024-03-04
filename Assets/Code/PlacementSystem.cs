@@ -59,6 +59,7 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBegin
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        _draggedObject.Value.MoveBy(Vector3.up * .2f);
         _draggedObject.Value = null;
     }
 
