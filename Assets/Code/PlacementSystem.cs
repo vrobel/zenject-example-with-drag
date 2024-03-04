@@ -44,6 +44,12 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBegin
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        
+        
+        //NOTE: I know it should be click on Library and Click on stage instead of drag and drop. My mistake. 
+        
+        
+        
         //if dragged object is missing, needs to be spawned.
         if (_draggedObjectProperty.Value == null)
         {
