@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Code.Assets;
-using TMPro;
 using UnityEngine;
 using Zenject;
 
@@ -10,12 +9,12 @@ namespace Code
     public class LibraryModel : IInitializable
     {
         private readonly List<LibraryAssetItem> _items = new List<LibraryAssetItem>();
-        private Transform _root;
+        private RectTransform _root;
         private LibraryAssetItem.Factory _factory;
         private Library _library;
 
         [Inject]
-        private void Construct(Transform root, Library library, LibraryAssetItem.Factory factory)
+        private void Construct(RectTransform root, Library library, LibraryAssetItem.Factory factory)
         {
             _root = root;
             _library = library;

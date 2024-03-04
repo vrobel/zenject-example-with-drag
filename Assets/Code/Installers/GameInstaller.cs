@@ -13,6 +13,7 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private Transform sceneRoot;
     [SerializeField] private RectTransform libraryRoot;
     [SerializeField] private LibraryModelFilter libraryModelFilter;
+    [SerializeField] private LibraryPanelSlideAnimator libraryPanelSlideAnimator;
 
     public override void InstallBindings()
     {
@@ -23,7 +24,9 @@ public class GameInstaller : MonoInstaller
         Container.BindInterfacesAndSelfTo<LibraryModel>().AsSingle().WithArguments(libraryRoot)
             .NonLazy();
         Container.Bind<LibraryModelFilter>().FromInstance(libraryModelFilter).AsSingle();
+        Container.BindInterfacesAndSelfTo<LibraryPanelSlideAnimator>().FromInstance(libraryPanelSlideAnimator).AsSingle();
         Container.Bind<PlacementSystem>().FromInstance(placementSystem).AsSingle();
+        Container.Bind<IObservablePlacementSystem>().To<PlacementSystem>().FromResolve();
         Container.Bind<Camera>().FromInstance(mainCamera).AsSingle();
 
         Container.BindFactory<SceneItem, SceneItem, SceneItem.Factory>()

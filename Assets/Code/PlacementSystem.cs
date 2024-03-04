@@ -1,16 +1,20 @@
-﻿using Code;
+﻿using System;
+using Code;
 using Code.Assets;
+using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
 
-public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private bool IsDragging => _draggedObject != null;
-    private SceneItem _draggedObject;
+    private readonly ReactiveProperty<SceneItem> _draggedObject =
+        new ReactiveProperty<SceneItem>();
     private LibraryAsset _objectAsset;
     private SceneModel _sceneModel;
     private Camera _mainCamera;
+
+    public Observable<SceneItem> DraggedObject => _draggedObject;
 
     [Inject]
     private void Inject(SceneModel sceneModel, Camera mainCamera)
@@ -22,7 +26,7 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void InitializeDrag(SceneItem draggedObject, LibraryAsset objectAsset,
         PointerEventData eventData)
     {
-        _draggedObject = draggedObject;
+        _draggedObject.Value = draggedObject;
         _objectAsset = objectAsset;
 
         if (draggedObject != null)
@@ -38,12 +42,12 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnBeginDrag(PointerEventData eventData)
     {
         //if dragged object is missing, needs to be spawned.
-        if (_draggedObject == null)
+        if (_draggedObject.Value == null)
         {
-            _draggedObject = _sceneModel.CreateSceneItem(_objectAsset);
+            _draggedObject.Value = _sceneModel.CreateSceneItem(_objectAsset);
         }
 
-        eventData.selectedObject = _draggedObject.gameObject;
+        eventData.selectedObject = _draggedObject.Value.gameObject;
         MoveToPosition(eventData.position, true);
     }
 
@@ -55,14 +59,14 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        _draggedObject = null;
+        _draggedObject.Value = null;
     }
 
     public void OnCancel(BaseEventData eventData)
     {
         eventData.selectedObject = null;
-        if (_draggedObject != null) _sceneModel.DestroySceneItem(_draggedObject);
-        _draggedObject = null;
+        if (_draggedObject.Value != null) _sceneModel.DestroySceneItem(_draggedObject.Value);
+        _draggedObject.Value = null;
     }
 
     #endregion
@@ -76,10 +80,10 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         {
             if (includeTransformMovement)
             {
-                _draggedObject.transform.position = hitInfo.point;
+                _draggedObject.Value.transform.position = hitInfo.point;
             }
 
-            _draggedObject.MoveTo(hitInfo.point);
+            _draggedObject.Value.MoveTo(hitInfo.point);
         }
     }
 }

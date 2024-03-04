@@ -1151,6 +1151,7 @@ MonoBehaviour:
   sceneRoot: {fileID: 1961953240}
   libraryRoot: {fileID: 1309352048}
   libraryModelFilter: {fileID: 201502071}
+  libraryPanelSlideAnimator: {fileID: 1062660403}
 --- !u!114 &937320086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1397,6 +1398,7 @@ GameObject:
   - component: {fileID: 1062660400}
   - component: {fileID: 1062660402}
   - component: {fileID: 1062660401}
+  - component: {fileID: 1062660403}
   m_Layer: 5
   m_Name: Left Panel
   m_TagString: Untagged
@@ -1464,6 +1466,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1062660399}
   m_CullTransparentMesh: 1
+--- !u!114 &1062660403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062660399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45130f1d7fdc4381bdc2ad495dc44a48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panel: {fileID: 1062660400}
+  duration: 0.5
 --- !u!1 &1160234425
 GameObject:
   m_ObjectHideFlags: 0

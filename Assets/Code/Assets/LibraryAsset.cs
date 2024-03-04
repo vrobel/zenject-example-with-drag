@@ -2,7 +2,7 @@
 
 namespace Code.Assets
 {
-    [CreateAssetMenu(menuName = "Nomtec/Library asset")]
+    [CreateAssetMenu(menuName = "Nomtek/Library asset")]
     public class LibraryAsset : ScriptableObject
     {
         [SerializeField] private string label;
