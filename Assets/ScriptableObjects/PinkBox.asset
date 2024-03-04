@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d4643c14f144dbca6dc726666c611f7, type: 3}
-  m_Name: GreenBox
+  m_Name: PinkBox
   m_EditorClassIdentifier: 
-  label: Green Box
+  label: Pink Box
   thumbnail: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   listItemPrefab: {fileID: 821506847332662781, guid: a19a16e6f1a193549b57697595614650,
     type: 3}
-  sceneItemPrefab: {fileID: 7349231555025923925, guid: c53248698765c5f4794b66299745c0ea,
+  sceneItemPrefab: {fileID: 7349231555025923925, guid: 9df814b0a17031e4ba2527cc63a68bcd,
     type: 3}

@@ -33,6 +33,8 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         eventData.pointerDrag = gameObject;
     }
 
+    #region IDrag
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         //if dragged object is missing, needs to be spawned.
@@ -62,6 +64,8 @@ public class PlacementSystem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         if (_draggedObject != null) _sceneModel.DestroySceneItem(_draggedObject);
         _draggedObject = null;
     }
+
+    #endregion
 
     private void MoveToPosition(Vector2 eventDataPosition,
         bool includeTransformMovement = false)

@@ -7,5 +7,7 @@ namespace Code.Assets
     public class Library : ScriptableObject
     {
         [SerializeField] private List<LibraryAsset> assets;
+
+        public IReadOnlyList<LibraryAsset> AssetsReadonly => assets.AsReadOnly();
     }
 }

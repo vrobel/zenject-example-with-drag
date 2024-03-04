@@ -24,6 +24,8 @@ namespace Code
             rb.MovePosition(position);
         }
 
+        #region IDrag
+
         public void OnInitializePotentialDrag(PointerEventData eventData)
         {
             _signalBus.Fire(new DragSignal(this, eventData));
@@ -34,6 +36,8 @@ namespace Code
             //note: not in use. shouldn't be called
             Debug.LogError("Shouldn't be called");
         }
+
+        #endregion
 
         private void OnValidate()
         {

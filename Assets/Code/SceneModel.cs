@@ -16,6 +16,7 @@ namespace Code
         {
             _factory = factory;
             _root = root;
+            _sceneItems.AddRange(_root.GetComponentsInChildren<SceneItem>());
         }
 
         public SceneItem CreateSceneItem(LibraryAsset libraryAsset)

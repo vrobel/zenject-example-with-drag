@@ -62,11 +62,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 22dbe73dc6c4d5948a86381674034d4b, type: 2}
+      objectReference: {fileID: 2100000, guid: 6929dc826846bbb49aa28cd7d549562f, type: 2}
     - target: {fileID: 3753621901215172414, guid: 19cbfb7c55df0e64dbc38925adc7f58a,
         type: 3}
       propertyPath: m_Name
-      value: GreenBox
+      value: YellowBox
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

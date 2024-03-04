@@ -9,24 +9,31 @@ public class GameInstaller : MonoInstaller
 {
     [SerializeField] private PlacementSystem placementSystem;
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private LibraryAsset testLibraryAsset;
+    [SerializeField] private Library library;
     [SerializeField] private Transform sceneRoot;
     [SerializeField] private RectTransform libraryRoot;
+    [SerializeField] private LibraryModelFilter libraryModelFilter;
 
     public override void InstallBindings()
     {
         SignalBusInstaller.Install(Container);
 
-        Container.Bind<SceneModel>().AsSingle().WithArguments(sceneRoot);
-        Container.Bind<LibraryModel>().AsSingle().WithArguments(libraryRoot);
+        Container.Bind<Library>().FromInstance(library).AsSingle();
+        Container.Bind<SceneModel>().AsSingle().WithArguments(sceneRoot).NonLazy();
+        Container.BindInterfacesAndSelfTo<LibraryModel>().AsSingle().WithArguments(libraryRoot)
+            .NonLazy();
+        Container.Bind<LibraryModelFilter>().FromInstance(libraryModelFilter).AsSingle();
         Container.Bind<PlacementSystem>().FromInstance(placementSystem).AsSingle();
         Container.Bind<Camera>().FromInstance(mainCamera).AsSingle();
 
         Container.BindFactory<SceneItem, SceneItem, SceneItem.Factory>()
             .FromFactory<PrefabFactory<SceneItem>>();
 
-        Container.BindFactory<LibraryAssetItem, LibraryAssetItem, LibraryAssetItem.Factory>()
-            .FromFactory<PrefabFactory<LibraryAssetItem>>();
+        Container
+            .BindFactory<LibraryAssetItem, LibraryAsset, LibraryAssetItem,
+                LibraryAssetItem.Factory>()
+            .FromFactory<
+                PrefabFactory<LibraryAsset, LibraryAssetItem>>();
 
         Container.DeclareSignal<DragSignal>();
         Container.BindSignal<DragSignal>()
