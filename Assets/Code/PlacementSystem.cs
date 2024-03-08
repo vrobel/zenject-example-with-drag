@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Zenject;
 
-public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPointerClickHandler
+public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPointerClickHandler, ICancelHandler
 {
     [SerializeField] private float updateLerpFactor = 0.8f;
     
@@ -27,7 +27,7 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPoint
         _mainCamera = mainCamera;
     }
 
-    public void InitializeDrag(SceneItem draggedObject, LibraryAsset objectAsset)
+    public void InitializeDrag(SceneItem draggedObject, LibraryAsset objectAsset, PointerEventData eventData)
     {
         if (_draggedObjectProperty.Value != null)
         {
@@ -48,6 +48,8 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPoint
         {
             _draggedObjectProperty.Value = _sceneModel.CreateSceneItem(_objectAsset);
         }
+
+        eventData.selectedObject = gameObject;
         
         //initial position
         var plane = new Plane(transform.up, transform.position);
@@ -83,7 +85,14 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPoint
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        eventData.selectedObject = null;
         TryCompleteDrag();
+    }
+
+    public void OnCancel(BaseEventData eventData)
+    {
+        eventData.selectedObject = null;
+        CancelDrag();
     }
 
     private void UpdateDraggedObject(bool includeTransformMovement = false)

@@ -46,7 +46,7 @@ namespace Code
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _signalBus.Fire(new DragSignal(libraryAssetReference));
+            _signalBus.Fire(new DragSignal(libraryAssetReference, eventData));
         }
 
         public sealed class Factory : PlaceholderFactory<LibraryAssetItem, LibraryAsset, LibraryAssetItem>
