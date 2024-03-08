@@ -42,22 +42,23 @@ namespace Code
                 return;
             }
             
+            var closestItem = FindClosestPrey();
+
+            _animator.enabled = closestItem != null;
+            if (closestItem != null)
+            {
+                FollowPrey(closestItem);
+            }
+        }
+
+        private SceneItem FindClosestPrey()
+        {
             var refPos = _sceneItem.transform.localPosition;
             SceneItem closestItem = null;
             var closestDistance = float.MaxValue;
             var first = true;
-            foreach (var item in _sceneModel.SceneItemsReadonly)
+            foreach (var item in _sceneModel.SceneItemsReadonly.Where(PreyFilter))
             {
-                if (item == _sceneItem)
-                {
-                    continue;
-                }
-
-                if (!item.isActive)
-                {
-                    continue;
-                }
-
                 if (first)
                 {
                     first = false;
@@ -74,11 +75,34 @@ namespace Code
                 closestDistance = (closestItem.transform.localPosition - refPos).sqrMagnitude;
             }
 
-            _animator.enabled = closestItem != null;
-            if (closestItem != null)
+            return closestItem;
+        }
+
+        private bool PreyFilter(SceneItem item)
+        {
+            if (item == _sceneItem)
             {
-                FollowPrey(closestItem);
+                return false;
             }
+
+            if (!item.isActive)
+            {
+                return false;
+            }
+
+            var prey = item.gameObject.GetComponent<Prey>();
+            if (prey == null)
+            {
+                return false;
+            }
+
+            var sameLevel = Mathf.Abs(item.transform.position.y - transform.position.y) < .1f;
+            if (!sameLevel)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void FollowPrey(SceneItem closestItem)
