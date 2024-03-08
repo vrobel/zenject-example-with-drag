@@ -9,8 +9,6 @@ using Zenject;
 
 public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPointerClickHandler, ICancelHandler
 {
-    [SerializeField] private float updateLerpFactor = 0.8f;
-    
     private readonly ReactiveProperty<SceneItem> _draggedObjectProperty =
         new ReactiveProperty<SceneItem>();
 
@@ -111,7 +109,7 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPoint
                 _draggedObjectProperty.Value.transform.position = hitInfo.point;
             }
 
-            _draggedObjectProperty.Value.LerpTowards(hitInfo.point, updateLerpFactor, .2f);
+            _draggedObjectProperty.Value.MoveTo(hitInfo.point);
         }
     }
 

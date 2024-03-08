@@ -39,16 +39,9 @@ namespace Code
             MoveTo(rb.position + vector3);
         }
         
-        public void LerpTowards(Vector3 position, float lerpFactor, float maxDistanceDelta)
-        {
-            var current = rb.position;
-            MoveTo(Vector3.MoveTowards(current,Vector3.Lerp(
-                current, position, lerpFactor), maxDistanceDelta));
-        }
-        
         public void MoveTo(Vector3 position)
         {
-            rb.MovePosition(position);
+            rb.position = position;
         }
 
         private void OnValidate()
