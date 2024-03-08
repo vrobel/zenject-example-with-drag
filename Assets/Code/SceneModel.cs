@@ -13,8 +13,7 @@ namespace Code
 
         public IReadOnlyList<SceneItem> SceneItemsReadonly => _sceneItems.AsReadOnly();
 
-        [Inject]
-        private void Construct(Transform root, SceneItem.Factory factory)
+        private SceneModel(Transform root, SceneItem.Factory factory)
         {
             _factory = factory;
             _root = root;

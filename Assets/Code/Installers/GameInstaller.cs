@@ -14,6 +14,7 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private RectTransform libraryRoot;
     [SerializeField] private LibraryModelFilter libraryModelFilter;
     [SerializeField] private LibraryPanelSlideAnimator libraryPanelSlideAnimator;
+    [SerializeField] private float yKillZone = -10f;
 
     public override void InstallBindings()
     {
@@ -21,6 +22,7 @@ public class GameInstaller : MonoInstaller
 
         Container.Bind<Library>().FromInstance(library).AsSingle();
         Container.Bind<SceneModel>().AsSingle().WithArguments(sceneRoot).NonLazy();
+        Container.BindInterfacesAndSelfTo<DroppedItemKillZone>().AsSingle().WithArguments(yKillZone).NonLazy();
         Container.BindInterfacesAndSelfTo<LibraryModel>().AsSingle().WithArguments(libraryRoot)
             .NonLazy();
         Container.Bind<LibraryModelFilter>().FromInstance(libraryModelFilter).AsSingle();
