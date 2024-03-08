@@ -19,6 +19,7 @@ namespace Code
 
         private SceneModel _sceneModel;
         private Vector3 _velocity;
+        [SerializeField, Range(0f,1f)] private float maxRadiansDelta;
 
         [Inject]
         private void Construct(SceneModel sceneModel)
@@ -76,11 +77,22 @@ namespace Code
             _animator.enabled = closestItem != null;
             if (closestItem != null)
             {
-                _sceneItem.transform.LookAt(closestItem.transform.position, Vector3.up);
-                _sceneItem.MoveBy((closestItem.transform.position -
-                                   _sceneItem.transform.position).normalized * (_speed *
-                    Time.fixedDeltaTime));
+                FollowPrey(closestItem);
             }
+        }
+
+        private void FollowPrey(SceneItem closestItem)
+        {
+            var rotateTowards =
+                Vector3.RotateTowards(_sceneItem.transform.forward,
+                    closestItem.transform.position - _sceneItem.transform.position,
+                    maxRadiansDelta * Mathf.PI, float.MaxValue);
+            _sceneItem.transform.rotation =
+                Quaternion.LookRotation(rotateTowards, Vector3.up);
+
+            _sceneItem.MoveBy((closestItem.transform.position -
+                               _sceneItem.transform.position).normalized * (_speed *
+                Time.fixedDeltaTime));
         }
 
         private void OnTriggerEnter(Collider other)

@@ -97,6 +97,7 @@ MonoBehaviour:
   _animator: {fileID: 1994260669952429891}
   _trigger: {fileID: 6119595841276713937}
   _speed: 1.5
+  maxRadiansDelta: 0.05
 --- !u!95 &1994260669952429891
 Animator:
   serializedVersion: 5
