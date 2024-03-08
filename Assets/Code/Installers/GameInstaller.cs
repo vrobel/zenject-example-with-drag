@@ -41,8 +41,7 @@ public class GameInstaller : MonoInstaller
         Container.DeclareSignal<DragSignal>();
         Container.BindSignal<DragSignal>()
             .ToMethod<PlacementSystem>((system, signal) =>
-                system.InitializeDrag(signal.DraggedObject, signal.ObjectAsset,
-                    signal.PointerEvent))
+                system.InitializeDrag(signal.DraggedObject, signal.ObjectAsset))
             .FromResolve();
     }
 

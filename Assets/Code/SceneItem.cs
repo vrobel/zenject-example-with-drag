@@ -8,47 +8,48 @@ using Zenject;
 
 namespace Code
 {
-    public class SceneItem : MonoBehaviour, IInitializePotentialDragHandler, IDragHandler
+    public class SceneItem : MonoBehaviour
     {
         public readonly ReactiveProperty<bool> IsActiveProperty =
             new ReactiveProperty<bool>(true);
         
         [SerializeField] private Rigidbody rb;
-        private SignalBus _signalBus;
+        
+        private DisposableBag _disposableBag;
 
         public bool isActive => IsActiveProperty.Value;
 
-        [Inject]
-        private void Construct(SignalBus signalBus)
+        private void Awake()
         {
-            _signalBus = signalBus;
+            IsActiveProperty.Subscribe(isActive => rb.isKinematic = !isActive).AddTo(ref _disposableBag);
+        }
+
+        private void OnDestroy()
+        {
+            _disposableBag.Dispose();
+        }
+
+        [Inject]
+        private void Construct()
+        {
         }
 
         public void MoveBy(Vector3 vector3)
         {
-            rb.MovePosition(rb.position + vector3);
+            MoveTo(rb.position + vector3);
+        }
+        
+        public void LerpTowards(Vector3 position, float lerpFactor, float maxDistanceDelta)
+        {
+            var current = rb.position;
+            MoveTo(Vector3.MoveTowards(current,Vector3.Lerp(
+                current, position, lerpFactor), maxDistanceDelta));
         }
         
         public void MoveTo(Vector3 position)
         {
-            //todo: should be called from FixedUpdate
             rb.MovePosition(position);
         }
-
-        #region IDrag
-
-        public void OnInitializePotentialDrag(PointerEventData eventData)
-        {
-            _signalBus.Fire(new DragSignal(this, eventData));
-        }
-
-        public void OnDrag(PointerEventData eventData)
-        {
-            //note: not in use. shouldn't be called
-            Debug.LogError("Shouldn't be called");
-        }
-
-        #endregion
 
         private void OnValidate()
         {

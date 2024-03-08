@@ -4,11 +4,13 @@ using Code.Assets;
 using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using Zenject;
 
-public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBeginDragHandler,
-    IDragHandler, IEndDragHandler
+public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPointerClickHandler
 {
+    [SerializeField] private float updateLerpFactor = 0.8f;
+    
     private readonly ReactiveProperty<SceneItem> _draggedObjectProperty =
         new ReactiveProperty<SceneItem>();
 
@@ -25,68 +27,73 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBegin
         _mainCamera = mainCamera;
     }
 
-    public void InitializeDrag(SceneItem draggedObject, LibraryAsset objectAsset,
-        PointerEventData eventData)
+    public void InitializeDrag(SceneItem draggedObject, LibraryAsset objectAsset)
     {
+        if (_draggedObjectProperty.Value != null)
+        {
+            CancelDrag();
+            return;
+        }
+        
         _draggedObjectProperty.Value = draggedObject;
         _objectAsset = objectAsset;
 
         if (draggedObject != null)
         {
             draggedObject.IsActiveProperty.Value = false;
-            eventData.selectedObject = draggedObject.gameObject;
         }
 
-        eventData.pointerDrag = gameObject;
-    }
-
-    #region IDrag
-
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        
-        
-        //NOTE: I know it should be click on Library and Click on stage instead of drag and drop. My mistake. 
-        
-        
-        
         //if dragged object is missing, needs to be spawned.
         if (_draggedObjectProperty.Value == null)
         {
             _draggedObjectProperty.Value = _sceneModel.CreateSceneItem(_objectAsset);
         }
+        
+        //initial position
+        var plane = new Plane(transform.up, transform.position);
+        var ray = ScreenPointToRay();
+        plane.Raycast(ray, out var enter);
+        _draggedObjectProperty.Value.transform.position = ray.GetPoint(enter);
 
-        eventData.selectedObject = _draggedObjectProperty.Value.gameObject;
-        MoveToPosition(eventData.position, true);
+        UpdateDraggedObject(true);
     }
 
-    public void OnDrag(PointerEventData eventData)
+    private void TryCompleteDrag()
     {
-        var eventDataPosition = eventData.position;
-        MoveToPosition(eventDataPosition);
+        if (_draggedObjectProperty.Value != null)
+        {
+            UpdateDraggedObject();
+            _draggedObjectProperty.Value.IsActiveProperty.Value = true;
+            _draggedObjectProperty.Value.MoveBy(Vector3.up * .2f);
+            _draggedObjectProperty.Value = null;
+        }
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    private void CancelDrag()
     {
-        _draggedObjectProperty.Value.IsActiveProperty.Value = true;
-        _draggedObjectProperty.Value.MoveBy(Vector3.up * .2f);
-        _draggedObjectProperty.Value = null;
-    }
-
-    public void OnCancel(BaseEventData eventData)
-    {
-        eventData.selectedObject = null;
         if (_draggedObjectProperty.Value != null)
             _sceneModel.DestroySceneItem(_draggedObjectProperty.Value);
         _draggedObjectProperty.Value = null;
     }
 
-    #endregion
-
-    private void MoveToPosition(Vector2 eventDataPosition,
-        bool includeTransformMovement = false)
+    public void FixedUpdate()
     {
-        var ray = _mainCamera.ScreenPointToRay(eventDataPosition);
+        UpdateDraggedObject();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        TryCompleteDrag();
+    }
+
+    private void UpdateDraggedObject(bool includeTransformMovement = false)
+    {
+        if (_draggedObjectProperty.Value == null)
+        {
+            return;
+        }
+
+        var ray = ScreenPointToRay();
         var groundLayerMask = LayerMask.GetMask("Ground");
         if (Physics.Raycast(ray, out var hitInfo, float.MaxValue, groundLayerMask))
         {
@@ -95,7 +102,12 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IBegin
                 _draggedObjectProperty.Value.transform.position = hitInfo.point;
             }
 
-            _draggedObjectProperty.Value.MoveTo(hitInfo.point);
+            _draggedObjectProperty.Value.LerpTowards(hitInfo.point, updateLerpFactor, .2f);
         }
+    }
+
+    private Ray ScreenPointToRay()
+    {
+        return _mainCamera.ScreenPointToRay(Mouse.current.position.value);
     }
 }

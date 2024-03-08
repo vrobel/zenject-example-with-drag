@@ -8,7 +8,7 @@ using Zenject;
 
 namespace Code
 {
-    public class LibraryAssetItem : MonoBehaviour, IInitializePotentialDragHandler, IDragHandler
+    public class LibraryAssetItem : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private LibraryAsset libraryAssetReference;
         [SerializeField] private Image image;
@@ -44,20 +44,10 @@ namespace Code
             gameObject.SetActive(setActive);
         }
 
-        #region IDrag
-
-        public void OnInitializePotentialDrag(PointerEventData eventData)
+        public void OnPointerClick(PointerEventData eventData)
         {
-            _signalBus.Fire(new DragSignal(libraryAssetReference, eventData));
+            _signalBus.Fire(new DragSignal(libraryAssetReference));
         }
-
-        public void OnDrag(PointerEventData eventData)
-        {
-            //note: not in use. shouldn't be called
-            Debug.LogError("Shouldn't be called");
-        }
-
-        #endregion
 
         public sealed class Factory : PlaceholderFactory<LibraryAssetItem, LibraryAsset, LibraryAssetItem>
         {

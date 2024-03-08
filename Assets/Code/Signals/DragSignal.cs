@@ -5,20 +5,17 @@ namespace Code.Signals
 {
     public class DragSignal
     {
-        public DragSignal(LibraryAsset objectAsset, PointerEventData pointerEvent)
+        public DragSignal(LibraryAsset objectAsset)
         {
             ObjectAsset = objectAsset;
-            PointerEvent = pointerEvent;
         }
 
-        public DragSignal(SceneItem draggedObject, PointerEventData pointerEvent)
+        public DragSignal(SceneItem draggedObject)
         {
             DraggedObject = draggedObject;
-            PointerEvent = pointerEvent;
         }
 
         public SceneItem DraggedObject { get; }
         public LibraryAsset ObjectAsset { get; }
-        public PointerEventData PointerEvent { get; }
     }
 }
