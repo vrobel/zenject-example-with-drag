@@ -170,7 +170,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 918ac02bb04047bcb0f7793494f51da6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  updateLerpFactor: 0.8
 --- !u!1 &190090701
 GameObject:
   m_ObjectHideFlags: 0
@@ -1442,6 +1441,7 @@ MonoBehaviour:
   libraryRoot: {fileID: 1347790747}
   libraryModelFilter: {fileID: 201502071}
   libraryPanelSlideAnimator: {fileID: 1062660403}
+  yKillZone: -10
 --- !u!114 &937320086
 MonoBehaviour:
   m_ObjectHideFlags: 0
