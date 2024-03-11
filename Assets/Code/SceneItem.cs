@@ -1,9 +1,6 @@
 ﻿using System;
-using Code.Assets;
-using Code.Signals;
 using R3;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Zenject;
 
 namespace Code
@@ -15,18 +12,11 @@ namespace Code
         
         [SerializeField] private Rigidbody rb;
         
-        private DisposableBag _disposableBag;
-
         public bool isActive => IsActiveProperty.Value;
 
         private void Awake()
         {
-            IsActiveProperty.Subscribe(isActive => rb.isKinematic = !isActive).AddTo(ref _disposableBag);
-        }
-
-        private void OnDestroy()
-        {
-            _disposableBag.Dispose();
+            IsActiveProperty.Subscribe(isActive => rb.isKinematic = !isActive).AddTo(this);
         }
 
         [Inject]
