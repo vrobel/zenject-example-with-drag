@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ObservableCollections;
 using R3;
 using UnityEngine;
+using UnityEngine.Profiling;
 using Zenject;
 
 namespace Code
 {
     public class BoxEaterHunting : MonoBehaviour
     {
-        DisposableBag _disposable;
-        
         [SerializeField] private SceneItem _sceneItem;
         [SerializeField] private Animator _animator;
         [SerializeField] private Collider _trigger;
@@ -18,21 +18,35 @@ namespace Code
         [SerializeField] private float _speed = 1f;
 
         private SceneModel _sceneModel;
-        private Vector3 _velocity;
         [SerializeField, Range(0f,1f)] private float maxRadiansDelta;
+        private ISynchronizedView<SceneItem, SceneItemPreyView> _preySceneItems;
+
+        private class SceneItemPreyView
+        {
+            public readonly bool IsPrey;
+
+            public SceneItemPreyView(SceneItem item)
+            {
+                IsPrey = item.TryGetComponent<Prey>(out _);
+            }
+        }
 
         [Inject]
         private void Construct(SceneModel sceneModel)
         {
             _sceneModel = sceneModel;
-
-            _sceneItem.IsActiveProperty.Subscribe(OnActiveStateChanged).AddTo(ref _disposable);
         }
 
-        private void OnActiveStateChanged(bool isActive)
+        private void Start()
         {
-            _animator.enabled = isActive;
-            _trigger.enabled = isActive;
+            _sceneItem.IsActiveProperty.Subscribe(OnActiveStateChanged).AddTo(this);
+            _preySceneItems = _sceneModel.SceneItemsObservableCollection.CreateView(
+                item =>
+                {
+                    var view = new SceneItemPreyView(item);
+                    return !view.IsPrey || item == _sceneItem ? null : view;
+                });
+            _preySceneItems.AttachFilter(PreyDynamicFilter);
         }
 
         private void FixedUpdate()
@@ -41,62 +55,45 @@ namespace Code
             {
                 return;
             }
-            
-            var closestItem = FindClosestPrey();
 
-            _animator.enabled = closestItem != null;
-            if (closestItem != null)
+            var hasAny = _preySceneItems.Any();
+            var closestItem = hasAny ? _preySceneItems.Aggregate(FindCloserPrey).Value : null;
+            
+            _animator.enabled = hasAny;
+            if (hasAny)
             {
                 FollowPrey(closestItem);
             }
         }
 
-        private SceneItem FindClosestPrey()
+        private (SceneItem, SceneItemPreyView) FindCloserPrey((SceneItem, SceneItemPreyView) i1, (SceneItem, SceneItemPreyView) i2)
         {
-            var refPos = _sceneItem.transform.localPosition;
-            SceneItem closestItem = null;
-            var closestDistance = float.MaxValue;
-            var first = true;
-            foreach (var item in _sceneModel.SceneItemsReadonly.Where(PreyFilter))
-            {
-                if (first)
-                {
-                    first = false;
-                    closestItem = item;
-                    closestDistance = (closestItem.transform.localPosition - refPos)
-                        .sqrMagnitude;
-                    continue;
-                }
-
-                closestItem = (item.transform.localPosition - refPos).sqrMagnitude <
-                              closestDistance
-                    ? item
-                    : closestItem;
-                closestDistance = (closestItem.transform.localPosition - refPos).sqrMagnitude;
-            }
-
-            return closestItem;
+            var hunterPosition = _sceneItem.transform.localPosition;
+            return (i1.Item1.transform.localPosition - hunterPosition).sqrMagnitude <
+                   (i2.Item1.transform.localPosition - hunterPosition).sqrMagnitude
+                ? i1
+                : i2;
         }
 
-        private bool PreyFilter(SceneItem item)
+        private void OnActiveStateChanged(bool isActive)
         {
-            if (item == _sceneItem)
+            _animator.enabled = isActive;
+            _trigger.enabled = isActive;
+        }
+
+        private bool PreyDynamicFilter(SceneItem item, SceneItemPreyView view)
+        {
+            if (view == null)
             {
                 return false;
             }
-
+            
             if (!item.isActive)
             {
                 return false;
             }
 
-            var prey = item.gameObject.GetComponent<Prey>();
-            if (prey == null)
-            {
-                return false;
-            }
-
-            var sameLevel = Mathf.Abs(item.transform.position.y - transform.position.y) < .1f;
+            var sameLevel = Mathf.Abs(item.transform.localPosition.y - transform.localPosition.y) < .1f;
             if (!sameLevel)
             {
                 return false;

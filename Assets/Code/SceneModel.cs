@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using Code.Assets;
+using ObservableCollections;
 using UnityEngine;
-using Zenject;
 
 namespace Code
 {
     public class SceneModel
     {
-        private readonly List<SceneItem> _sceneItems = new List<SceneItem>();
+        private readonly ObservableList<SceneItem> _sceneItems = new ObservableList<SceneItem>();
         private Transform _root;
         private SceneItem.Factory _factory;
 
-        public IReadOnlyList<SceneItem> SceneItemsReadonly => _sceneItems.AsReadOnly();
+        public IReadOnlyList<SceneItem> SceneItemsReadonly => _sceneItems;
+        public IObservableCollection<SceneItem> SceneItemsObservableCollection => _sceneItems;
 
         private SceneModel(Transform root, SceneItem.Factory factory)
         {
