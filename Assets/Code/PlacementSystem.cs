@@ -15,6 +15,7 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPoint
     private LibraryAsset _objectAsset;
     private SceneModel _sceneModel;
     private Camera _mainCamera;
+    private readonly RaycastHit[] _results = new RaycastHit[1];
 
     public Observable<SceneItem> DraggedObjectObservable => _draggedObjectProperty;
 
@@ -102,14 +103,16 @@ public class PlacementSystem : MonoBehaviour, IObservablePlacementSystem, IPoint
 
         var ray = ScreenPointToRay();
         var groundLayerMask = LayerMask.GetMask("Ground");
-        if (Physics.Raycast(ray, out var hitInfo, float.MaxValue, groundLayerMask))
+        var hits = Physics.RaycastNonAlloc(ray, _results, float.MaxValue, groundLayerMask);
+        if (hits > 0)
         {
+            var raycastHit = _results[0];
             if (includeTransformMovement)
             {
-                _draggedObjectProperty.Value.transform.position = hitInfo.point;
+                _draggedObjectProperty.Value.transform.position = raycastHit.point;
             }
 
-            _draggedObjectProperty.Value.MoveTo(hitInfo.point);
+            _draggedObjectProperty.Value.MoveTo(raycastHit.point);
         }
     }
 
