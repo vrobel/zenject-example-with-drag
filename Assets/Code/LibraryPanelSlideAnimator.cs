@@ -6,10 +6,8 @@ using R3;
 
 namespace Code
 {
-    public class LibraryPanelSlideAnimator : MonoBehaviour, IInitializable, IDisposable
+    public class LibraryPanelSlideAnimator : MonoBehaviour, IInitializable
     {
-        DisposableBag _disposable;
-
         [SerializeField] private RectTransform panel;
         [Range(0f, 1f), SerializeField] private float duration = 0.5f;
 
@@ -52,17 +50,12 @@ namespace Code
         {
             _panelAnchoredPosition = panel.anchoredPosition;
             _observablePlacementSystem.DraggedObjectObservable.Subscribe(OnDragging)
-                .AddTo(ref _disposable);
+                .AddTo(this);
         }
 
         private void OnDragging(SceneItem obj)
         {
             IsHidden = obj != null;
-        }
-
-        public void Dispose()
-        {
-            _disposable.Dispose();
         }
     }
 }
